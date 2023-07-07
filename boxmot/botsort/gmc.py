@@ -281,7 +281,7 @@ class GMC:
 
         # Find rigid matrix
         if (np.size(prevPoints, 0) > 4) and (np.size(prevPoints, 0) == np.size(prevPoints, 0)):
-            H, inliesrs = cv2.estimateAffinePartial2D(prevPoints, currPoints, cv2.RANSAC)
+            H, inliesrs = cv2.estimateAffinePartial2D(prevPoints, currPoints, cv2.RANSAC)   # 使用RANSAC计算仿射矩阵
 
             # Handle downscale
             if self.downscale > 1.0:

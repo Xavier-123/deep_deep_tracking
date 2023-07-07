@@ -45,12 +45,16 @@ def on_predict_start(predictor):
 
 @torch.no_grad()
 def run(args):
-    
-    # model = YOLO(args['yolo_model'] if 'v8' in str(args['yolo_model']) else 'yolov8n')
 
-    # 使用RT-DETR
-    model = YOLO(args['yolo_model'])
-    model.task = "rtdetr_detect"
+    if 'v8' in str(args["yolo_model"]):
+        model = YOLO(args['yolo_model'])
+    elif 'rtdetr' in str(args["yolo_model"]):
+        # 使用RT-DETR
+        model = YOLO(args['yolo_model'])
+        model.task = "rtdetr_detect"
+    else:
+        model = YOLO('yolov8n')
+    # model = YOLO(args['yolo_model'] if 'v8' in str(args['yolo_model']) else 'yolov8n')
 
     overrides = model.overrides.copy()
     model.predictor = TASK_MAP[model.task][3](overrides=overrides, _callbacks=model.callbacks)
@@ -191,10 +195,11 @@ def run(args):
     
 
 '''
---yolo-model D:/Inspur/base_model/yolo8/yolov8m.pt
---yolo-model E:/work/AI_Project/ComputerVision/yolo/ultralytics/rtdetr-l.pt
+--yolo-model ./yolo_model/yolov8m.pt
+--yolo-model ./detr_model/rtdetr-l.pt
+--yolo-model E:/download/train/weights/rtdetr_cat.pt
 --tracking-method botsort/bytetrack/deepocsort/ocsort/strongsort
---source ../cat.mp4
+--source ./cat.mp4
 --img 640
 --reid-model ./reid_model/lmbn_n_cuhk03_d.pt
 --show

@@ -44,7 +44,7 @@ class STrack(BaseTrack):
         if self.smooth_feat is None:
             self.smooth_feat = feat
         else:
-            self.smooth_feat = self.alpha * self.smooth_feat + (1 - self.alpha) * feat
+            self.smooth_feat = self.alpha * self.smooth_feat + (1 - self.alpha) * feat      # 平滑特征，使其当前特征与前特征相关
         self.features.append(feat)
         self.smooth_feat /= np.linalg.norm(self.smooth_feat)
 
@@ -84,7 +84,7 @@ class STrack(BaseTrack):
                 if st.state != TrackState.Tracked:
                     multi_mean[i][6] = 0
                     multi_mean[i][7] = 0
-            multi_mean, multi_covariance = STrack.shared_kalman.multi_predict(multi_mean, multi_covariance)
+            multi_mean, multi_covariance = STrack.shared_kalman.multi_predict(multi_mean, multi_covariance)     # 卡尔曼滤波使用当前帧预测下一帧
             for i, (mean, cov) in enumerate(zip(multi_mean, multi_covariance)):
                 stracks[i].mean = mean
                 stracks[i].covariance = cov
@@ -96,7 +96,7 @@ class STrack(BaseTrack):
             multi_covariance = np.asarray([st.covariance for st in stracks])
 
             R = H[:2, :2]
-            R8x8 = np.kron(np.eye(4, dtype=float), R)
+            R8x8 = np.kron(np.eye(4, dtype=float), R)    # 计算两个列表的克罗内克乘积
             t = H[:2, 2]
 
             for i, (mean, cov) in enumerate(zip(multi_mean, multi_covariance)):
@@ -323,16 +323,16 @@ class BoTSORT(object):
         ''' Step 2: First association, with high score detection boxes'''
         strack_pool = joint_stracks(tracked_stracks, self.lost_stracks)
 
-        # Predict the current location with KF
+        # Predict the current location with KF   使用前一帧数据和卡尔曼滤波预测当前帧位置，更新了每个strack的mean和covariance
         STrack.multi_predict(strack_pool)
 
-        # Fix camera motion
+        # Fix camera motion（修复镜头抖动）
         warp = self.gmc.apply(img, dets)
         STrack.multi_gmc(strack_pool, warp)
         STrack.multi_gmc(unconfirmed, warp)
 
         # Associate with high score detection boxes
-        raw_emb_dists = embedding_distance(strack_pool, detections)
+        raw_emb_dists = embedding_distance(strack_pool, detections)    # 使用余弦相似度cosin计算REID提取特征的距离
         dists = fuse_motion(self.kalman_filter, raw_emb_dists, strack_pool, detections, only_position=False, lambda_=self.lambda_)
 
         # ious_dists = matching.iou_distance(strack_pool, detections)

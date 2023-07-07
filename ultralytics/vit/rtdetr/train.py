@@ -61,7 +61,7 @@ def train(cfg=DEFAULT_CFG, use_python=False):
     data = cfg.data or 'coco128.yaml'  # or yolo.ClassificationDataset("mnist")
     device = cfg.device if cfg.device is not None else ''
 
-    # NOTE: F.grid_sample which is in rt-detr does not support deterministic=True
+    # NOTE: F.grid_sample which is in rt-detr_model does not support deterministic=True
     # NOTE: amp training causes nan outputs and end with error while doing bipartite graph matching
     args = dict(model=model,
                 data=data,
