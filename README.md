@@ -1,0 +1,2 @@
+# deep_tracking
+基于yolo_tracking和ultralytics，引入目标检测模型为rtdetr的跟踪模型
